@@ -1,14 +1,9 @@
-######Video source: https://shop119322454.taobao.com
-#source("http://bioconductor.org/biocLite.R")   #source("https://bioconductor.org/biocLite.R")
-#biocLite("edgeR")
-#install.packages("gplots")
-
 foldChange=1.5
 padj=0.05
 
-setwd("F:\\biology\\TCGA\\STAD\\01Counts\\05Analysis\\01Deversity\\miRNA")                    #ÉèÖÃ¹¤×÷Ä¿Â¼
+
 library("edgeR")
-rt=read.table("miRNA_symbol.txt",sep="\t",header=T,check.names=F)  #¸Ä³É×Ô¼ºµÄÎÄ¼şÃû
+rt=read.table("miRNA_symbol.txt",sep="\t",header=T,check.names=F)  #æ”¹æˆè‡ªå·±çš„æ–‡ä»¶å
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
 exp=rt[,2:ncol(rt)]
@@ -17,7 +12,7 @@ data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 data=data[rowMeans(data)>1,]
 
-group=c(rep("normal",45),rep("tumor",446))                         #°´ÕÕ°©Ö¢ºÍÕı³£ÑùÆ·ÊıÄ¿ĞŞ¸Ä
+group=c(rep("normal",45),rep("tumor",446))                         #æŒ‰ç…§ç™Œç—‡å’Œæ­£å¸¸æ ·å“æ•°ç›®ä¿®æ”¹
 design <- model.matrix(~group)
 y <- DGEList(counts=data,group=group)
 y <- calcNormFactors(y)
@@ -41,16 +36,16 @@ diffDown = diff[(diff$FDR < padj & (diff$logFC<(-foldChange))),]
 write.table(diffDown, file="down.xls",sep="\t",quote=F)
 
 normalizeExp=rbind(id=colnames(newData),newData)
-write.table(normalizeExp,file="normalizeExp.txt",sep="\t",quote=F,col.names=F)   #Êä³öËùÓĞ»ùÒòĞ£ÕıºóµÄ±í´ïÖµ£¨normalizeExp.txt£©
+write.table(normalizeExp,file="normalizeExp.txt",sep="\t",quote=F,col.names=F)   #è¾“å‡ºæ‰€æœ‰åŸºå› æ ¡æ­£åçš„è¡¨è¾¾å€¼ï¼ˆnormalizeExp.txtï¼‰
 diffExp=rbind(id=colnames(newData),newData[rownames(diffSig),])
-write.table(diffExp,file="diffmRNAExp.txt",sep="\t",quote=F,col.names=F)         #Êä³ö²îÒì»ùÒòĞ£ÕıºóµÄ±í´ïÖµ£¨diffmRNAExp.txt£©
+write.table(diffExp,file="diffmRNAExp.txt",sep="\t",quote=F,col.names=F)         #è¾“å‡ºå·®å¼‚åŸºå› æ ¡æ­£åçš„è¡¨è¾¾å€¼ï¼ˆdiffmRNAExp.txtï¼‰
 
 heatmapData <- newData[rownames(diffSig),]
 
 #volcano
 pdf(file="vol.pdf")
 #tiff(file="vol.tiff",width =12,height =12,units ="cm",compression="lzw",bg="white",res=400)
-#xMax=300	#½â¾öPValue=0µÄÇé¿ö
+#xMax=300	#è§£å†³PValue=0çš„æƒ…å†µ
 xMax=max(-log10(allDiff$FDR))+1
 yMax=12
 plot(-log10(allDiff$FDR), allDiff$logFC, xlab="-log10(FDR)",ylab="logFC",
